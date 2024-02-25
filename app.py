@@ -6,8 +6,10 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Load dataset
 df = pd.read_csv('dataset.csv')
@@ -43,7 +45,7 @@ tf_model = keras.models.Sequential([
 ])
 
 # Load weights from scikit-learn model
-tf_model.set_weights([...])  # Load weights from your trained scikit-learn model
+# tf_model.set_weights([...])  # Load weights from your trained scikit-learn model
 
 # Save TensorFlow model to JSON file
 tf_model_json = tf_model.to_json()  # Convert model to JSON format
