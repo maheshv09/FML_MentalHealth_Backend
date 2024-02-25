@@ -40,8 +40,8 @@ def initServ():
 
 # Endpoint for sending the initial model to the frontend
 @app.route('/get_model', methods=['GET'])
-def get_model():
-    # Serialize the global model to send to the frontend
+def get_model_params():
+    # Serialize the global model parameters and send them to the frontend
     model_params = global_model.get_params()
     return jsonify(model_params)
 
