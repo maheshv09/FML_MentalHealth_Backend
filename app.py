@@ -1,9 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
+import tensorflow as tf
+from tensorflow import keras
 
 app = Flask(__name__)
 
@@ -33,6 +35,25 @@ X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2,
 # Initialize a basic model on the server
 global_model = RandomForestClassifier(n_estimators=100, random_state=42)
 global_model.fit(X_train, y_train)
+
+tf_model = keras.models.Sequential([
+    keras.layers.InputLayer(input_shape=(X_train.shape[1],)),  # Input shape based on the number of features
+    keras.layers.Dense(100, activation='relu'),  # Example hidden layer
+    keras.layers.Dense(1, activation='sigmoid')  # Output layer for binary classification
+])
+
+# Load weights from scikit-learn model
+tf_model.set_weights([...])  # Load weights from your trained scikit-learn model
+
+# Save TensorFlow model to JSON file
+tf_model_json = tf_model.to_json()  # Convert model to JSON format
+with open('model.json', 'w') as json_file:
+    json_file.write(tf_model_json)
+
+# Endpoint for serving the TensorFlow.js model file
+@app.route('/get_tf_model', methods=['GET'])
+def get_tf_model():
+    return send_from_directory('.', 'model.json')
 
 @app.route('/', methods = ['GET'])
 def initServ():
