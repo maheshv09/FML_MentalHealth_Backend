@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Training</title>
+</head>
+<body>
+    <h1> </h1>pred
+    <h2>We guess you might be in  {{myPred}}</h2>
+    <form action="{{ url_for('train_model', myPred=myPred , df=df  ) }}" method="post">
+        <!-- Add a hidden input field to include the value of myPred -->
+        <input type="hidden" name="myPred" value="{{ myPred }}">
+        <input type="hidden" name="expanded_df" value="{{ df }}">
+
+        <button type="submit">Train My Model</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                {% for col in df.columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in df.iterrows() %}
+            <tr>
+                {% for value in row %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</body>
+</html>

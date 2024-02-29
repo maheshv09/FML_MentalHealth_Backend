@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Survey Completed</title>
+</head>
+<body>
+    <h1>HERES WHAT WE RECIEVED :{{myanswers}}</h1>
+    <h2>Survey Completed!</h2>
+    <form action="/train_model" method="post">
+        <button type="submit">Train My Model</button>
+    </form>
+    <form action="{{ url_for('get_prediction', df=df ) }}" method="post">
+        <button type="submit">Get My Prediction</button>
+    </form>
+    <h2>oversampled dataset</h2>
+    <table>
+        <thead>
+            <tr>
+                {% for col in df.columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in df.iterrows() %}
+            <tr>
+                {% for value in row %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
