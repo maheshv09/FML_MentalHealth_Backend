@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client App</title>
+</head>
+<body>
+    <h1>Welcome to the Client App</h1>
+    <form id="prediction-form">
+        <!-- Assuming your questions are displayed dynamically -->
+        <div id="question-container">
+            <!-- Question will be inserted here -->
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="prediction-result">
+        <!-- Prediction result will be inserted here -->
+    </div>
+
+    <script>
+        // JavaScript logic for making predictions and updating UI
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fetch model from server when page loads
+            fetchModelFromServer();
+
+            // Dynamically populate questions
+            var questions = [
+                "Do you often feel nervous?",
+                "Do you experience panic attacks?",
+                // Add more questions here
+            ];
+
+            var questionContainer = document.getElementById("question-container");
+            questions.forEach(function(question, index) {
+                var label = document.createElement("label");
+                label.textContent = question;
+                
+                var input = document.createElement("input");
+                input.type = "checkbox";
+                input.name = "answer";
+                input.value = index;
+                
+                questionContainer.appendChild(label);
+                questionContainer.appendChild(input);
+                questionContainer.appendChild(document.createElement("br"));
+            });
+
+            // Event listener for form submission
+            document.getElementById("prediction-form").addEventListener("submit", function(event) {
+                event.preventDefault();
+                makePrediction();
+            });
+        });
+
+        function fetchModelFromServer() {
+            fetch("/get_model_from_server")
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error("Error fetching model from server:", error));
+        }
+
+        function makePrediction() {
+            var answers = Array.from(document.querySelectorAll("input[name='answer']:checked")).map(input => input.value);
+            if (answers.length === 0) {
+                alert("Please select at least one answer.");
+                return;
+            }
+            
+            fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ data: answers })
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                document.getElementById("prediction-result").textContent = data;
+            })
+            .catch(error => console.error("Error making prediction:", error));
+        }
+    </script>
+</body>
+</html>
