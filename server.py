@@ -5,6 +5,8 @@ from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense
 import pandas as pd
+import numpy as np
+import tensorflow as tf
 import pickle
 app = Flask(__name__)
 import base64
@@ -53,7 +55,7 @@ with open('model.json', 'w') as json_file:
     json_file.write(tf_model_json)
 
 # Save the model weights
-tf_model.save_weights('model_weights.h5')
+tf_model.save_weights('model_weights.weights.h5')
 
 
 
@@ -116,20 +118,27 @@ def get_model():
 
 @app.route('/get_weights', methods=['GET'])
 def get_weights():
-    return send_file('model_weights.h5', as_attachment=True)
+    return send_file('model_weights.weights.h5', as_attachment=True)
 
 @app.route('/update_model', methods=['POST'])
 def update_model():
-    global server_model
+    global tf_model
 
-    # Receive updated model weights from the client
-    updated_weights = request.json['weights']
+    # Receive updated model weights file from the client
+    updated_weights_file = request.files['file']
+    
+    # Save the received file
+    updated_weights_file.save('received_weights.weights.h5')
 
-    # Update the server model with received weights
-    server_model.set_weights(updated_weights)
+    # Load the weights from the received file
+    tf_model.load_weights('received_weights.weights.h5')
+    print("UPDATION SUCCESSFULL")
+
+    #testing
+    # input = tf.tensor2d([ [  1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0 ]])
+    print("\n\n\nPREDICTION--->",np.argmax(tf_model.predict([ [  0, 0, 0, 0, 0, 0,1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0  ]])))
 
     return 'Model updated successfully!'
-
 if __name__ == '__main__':
     # Start the Flask application
-    app.run(debug=True)
+    app.run(debug=True,use_reloader=False)
